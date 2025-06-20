@@ -1,6 +1,9 @@
 # 3d-food-reconstruction
 Real-world accurate 3D food reconstruction &amp; volume estimation
 
+## Task
+Using only monocular images...
+
 ## Challenges
 Primary challenges:
 
@@ -16,12 +19,12 @@ Using the pin-hole camera model it's possible to generate real-world accurate me
 Image EXIF data commonly includes focal-length measured in milimeters. The pin-hole camera model requires a focal length measured in pixels. This conversion can be done using the camera sensor's dimensions and the image dimensions. Sensor measurements are often available via manufacturer specifications, but it requires the camera make and model (sometimes available in EXIF). Some cameras will include in the EXIF data the focal length converted to 35mm equivalent, which can be easily converted to pixels. All of these measurements break down if any of the data is inaccurate or missing.
 
 #### Depth
-Ground truth depth measurements can be gathered outside of the camera, but not within. Pictures taken "in the wild" will almost never have depth data measured simultaneously. Additionally, to accurately calculate dimensions using the pin-hole camera model, depth data needs correspond to every pixel in the ROI to create a depth-map. This opens up areas for inaccuracies and "noise" in the depth-map.
+Ground truth depth measurements can be gathered using external sensors independent of the camera. However, pictures taken "in the wild" with "casual cameras" will rarely have depth data measured simultaneously. Additionally, to accurately calculate dimensions using the pin-hole camera model, depth data has to correspond to every pixel in the ROI to create a depth-map. This opens up areas for inaccuracies and "noise" in the depth-map.
 
 ## Solution
 
 ### Methodology
-The solution was based on a 4 key areas:
+The solution was achieved by focusing on 4 key areas:
 1. Depth map generation and scaling.
 2. Focal length estimation via known priors.
 3. Point cloud projection & measurement.
@@ -40,8 +43,14 @@ There are many depth estimation models available. Some as single purpose, others
 ### Implementation
 2. Focal Length Estimation
 #### Challenges
-EXIF is inaccurate/unavailable.
-Depth is at an unknown scale.
+While EXIF metadata has become commonplace in imaging, there is no guarantee that the data is accurate or always available.
+Lens focal lengths are commonly measured in milimeters. Camera sensors are also measured (hxw) in milimeters. This allows for a straightforward conversion of optical to pixel focal length. By using the formula ----- we can find the correlation of image pixels to meters. Common ranges are 2000-7000px. In other words, 2000 pixels corresponds to one meter of real-world distance in the X-Y image plane.
+Objects in the photograph exist in three dimensional space and are subject to perspective distortion. This means that measuring the height and width (Y & X) of a ROI will not give accurate dimensions. By combining the pixel focal length with depth, the pin-hole camera model allows us to calculate real world sizes with the following formula:
+
+
+
+Using that same formula, we can infer pixel focal length from object size.
+To use the pinhole camera model, the depth (Camera Z axis) has to be in the same real-world metric scale.
 Reference objects aren't present.
 #### Solution
 #### Methodology
