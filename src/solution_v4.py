@@ -2927,6 +2927,8 @@ def project_masks_to_pointclouds(depth: np.ndarray,
             if 'plate' in key:
                 # Enforce planarity
                 Z = torch.full((len(ix), len(iy)), torch.mean(depth_t[ix, iy]))
+                Z_val = torch.mean(depth_t[ix, iy])
+                Z = Z_val.expand_as(xf)
             else:
                 Z = depth_t[iy, ix]              # (N,)
             X = (xf - cx) * Z / f_px
