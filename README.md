@@ -6,6 +6,8 @@ Most volume-estimation pipelines rely on assumptions that real eating-occasion p
 
 > This is a technical write-up of the solution, not usage docs for the current repository. The workflow began as a Colab notebook and is being migrated into modular Python code under src/.
 
+![Challenge Overview](assets/challenge.png)
+
 This is my entry for [MetaFood 2025 Challenge 1: 3D Reconstruction From Monocular Multi-Food Images](https://sites.google.com/view/cvpr-metafood-2025/challenge-1). Scoring runs in two phases against 3D-scanner reference models. Phase I evaluates portion-size accuracy using Mean Absolute Percentage Error (MAPE) on predicted volumes. Phase II evaluates shape accuracy for the top Phase I teams using L1 Chamfer Distance following the DTU protocol. The final ranking weights Phase I volume 55% and Phase II shape 45%.
 
 ## The Problem
@@ -59,6 +61,11 @@ How it works.
 - Clean-up - Skip reference objects and deduplicate overlapping crops before mesh prep.
 - Correction - Send each remaining crop to Gemini. Map the returned name back to the dataset row, and rename with a standardized format.
 
+
+![Pizza Chicken Wing source](assets/9.JPG)
+![Masked crop A](assets/9_biscuit_masked.png)
+![Masked crop B](assets/9_cake_masked.png)
+
 [VISUAL: Pre-correction masked crops. Labels fixed in the Gemini naming step.]
 
 ### 3. Multi-Signal Focal Length and Depth Scale Estimation
@@ -107,7 +114,11 @@ How it works.
 - Cleanup - Remove Z-axis outlier spikes, fill holes (with aggressive passes for stubborn boundary loops), and add planar caps when still open.
 - Volume - Exact watertight volume when possible. Then voxelization (pitch derived from mesh size or fixed), and then convex hull. Convert cubic meters to milliliters and write back to the prediction DataFrame.
 
+![Final scaled pizza mesh](assets/9_pizza_mesh.png)
+
 [VISUAL: Final scaled pizza mesh]
+
+![Scaled chicken wing mesh](assets/9_wing_mesh.png)
 
 [VISUAL: Scaled chicken wing mesh before cleanup]
 
