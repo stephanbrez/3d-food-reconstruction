@@ -60,10 +60,10 @@ How it works:
 
 How it works.
 
-- Segmentation - Build class prompts from dataset food names. Add reference objects like plates, bowls, forks, and knives. Keep detections above a 0.35 confidence threshold and uniquely name duplicate classes.
-- Cropping - Convert each contour to a binary mask at depth-map resolution. Dilate or erode, and apply it as an alpha channel.
-- Clean-up - Skip reference objects and deduplicate overlapping crops before mesh prep.
-- Correction - Send each remaining crop to Gemini. Map the returned name back to the dataset row, and rename with a standardized format.
+- **Segmentation** - Build class prompts from dataset food names. Add reference objects like plates, bowls, forks, and knives. Keep detections above a 0.35 confidence threshold and uniquely name duplicate classes.
+- **Cropping** - Convert each contour to a binary mask at depth-map resolution. Dilate or erode, and apply it as an alpha channel.
+- **Clean-up** - Skip reference objects and deduplicate overlapping crops before mesh prep.
+- **Correction** - Send each remaining crop to Gemini. Map the returned name back to the dataset row, and rename with a standardized format.
 
 ![Segmentation results](assets/9_segmented.png)
 ![Masked crop A](assets/9_biscuit_masked.png)
@@ -81,10 +81,10 @@ How it works.
 
 How it works.
 
-- Reference estimation - focal_length = (size_pixels * distance) / real_world_size, with utensil-type validation by shape analysis and dimension heuristics for unusual angles.
-- Depth consistency - Compare median depths across plates and utensils. Apply confidence penalties proportional to inconsistency. Discard utensil estimates when consistency drops below 0.6.
-- Confidence weighting - Plates (0.7 to 0.95 with a circularity boost) over utensils (0.8) over EXIF (0.4 to 0.5) over default specs (0.2). Geometric confidence comes from circularity squared, so head-on views are preferred. Depth-consistency penalties reduce utensil confidence by a consistency-squared factor. Knives receive a cubic penalty. Non-independent estimates have their uncertainties inflated by 1.4x before fusion. Outlier detection runs before fusion. Emergency overrides kick in on severe inconsistency. The surviving estimates combine with precision-weighted averaging (1/sigma squared).
-- Plate refinement and depth scaling - Fit an ellipse to the plate, estimate circularity and viewing angle, and match to standard plate-size priors. Compare the plate depth distribution against geometric expectations. Then merge scale estimates by confidence.
+- **Reference estimation** - focal_length = (size_pixels * distance) / real_world_size, with utensil-type validation by shape analysis and dimension heuristics for unusual angles.
+- **Depth consistency** - Compare median depths across plates and utensils. Apply confidence penalties proportional to inconsistency. Discard utensil estimates when consistency drops below 0.6.
+- **Confidence weighting** - Plates (0.7 to 0.95 with a circularity boost) over utensils (0.8) over EXIF (0.4 to 0.5) over default specs (0.2). Geometric confidence comes from circularity squared, so head-on views are preferred. Depth-consistency penalties reduce utensil confidence by a consistency-squared factor. Knives receive a cubic penalty. Non-independent estimates have their uncertainties inflated by 1.4x before fusion. Outlier detection runs before fusion. Emergency overrides kick in on severe inconsistency. The surviving estimates combine with precision-weighted averaging (1/sigma squared).
+- **Plate refinement and depth scaling** - Fit an ellipse to the plate, estimate circularity and viewing angle, and match to standard plate-size priors. Compare the plate depth distribution against geometric expectations. Then merge scale estimates by confidence.
 
 ### 4. Point Cloud Footprint as the Scale Bridge
 
@@ -96,11 +96,11 @@ How it works.
 
 How it works:
 
-- Real-world dimensions - Convert arbitrary depth to metric using the merged scale factor.
-- Point cloud creation - Project masked pixels through the pinhole model into camera space.
-- Reference plane - Regularize plate points and fit a least-squares plane to the plate.
-- Compute dimensions - Project object clouds onto that plane, remove outliers, and compute width, height, and diagonal in meters.
-- Validate - Using the reference plane and plate circularity, recover a camera pose. Use plotly to visualize and verify the 3D space.
+- **Real-world dimensions** - Convert arbitrary depth to metric using the merged scale factor.
+- **Point cloud creation** - Project masked pixels through the pinhole model into camera space.
+- **Reference plane** - Regularize plate points and fit a least-squares plane to the plate.
+- **Compute dimensions** - Project object clouds onto that plane, remove outliers, and compute width, height, and diagonal in meters.
+- **Validate** - Using the reference plane and plate circularity, recover a camera pose. Use plotly to visualize and verify the 3D space.
 
 ### 5. Generative Meshes with Layered Volume Fallbacks
 
@@ -112,10 +112,10 @@ How it works:
 
 How it works.
 
-- Generation and conversion - TRELLIS .glb meshes loaded with trimesh, exported to the simpler .obj format. Match to dataset rows by food index and normalized name.
-- Metric scaling - Compute the mesh XY diagonal from X/Y extents. Apply a uniform scale factor to match the measured diagonal, and save to meshes/final_obj/.
-- Cleanup - Remove Z-axis outlier spikes, fill holes (with aggressive passes for stubborn boundary loops), and add planar caps when still open.
-- Volume - Exact watertight volume when possible. Then voxelization (pitch derived from mesh size or fixed), and then convex hull. Convert cubic meters to milliliters and write back to the prediction DataFrame.
+- **Generation and conversion** - TRELLIS .glb meshes loaded with trimesh, exported to the simpler .obj format. Match to dataset rows by food index and normalized name.
+- **Metric scaling** - Compute the mesh XY diagonal from X/Y extents. Apply a uniform scale factor to match the measured diagonal, and save to meshes/final_obj/.
+- **Cleanup** - Remove Z-axis outlier spikes, fill holes (with aggressive passes for stubborn boundary loops), and add planar caps when still open.
+- **Volume** - Exact watertight volume when possible. Then voxelization (pitch derived from mesh size or fixed), and then convex hull. Convert cubic meters to milliliters and write back to the prediction DataFrame.
 
 ![Final scaled pizza mesh](assets/9_pizza_mesh.png)
 
