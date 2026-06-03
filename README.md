@@ -65,7 +65,7 @@ How it works.
 - Clean-up - Skip reference objects and deduplicate overlapping crops before mesh prep.
 - Correction - Send each remaining crop to Gemini. Map the returned name back to the dataset row, and rename with a standardized format.
 
-![Segmentation results](assets/(assets/9_segmented.png)
+![Segmentation results](assets/9_segmented.png)
 ![Masked crop A](assets/9_biscuit_masked.png)
 ![Masked crop B](assets/9_cake_masked.png)
 
